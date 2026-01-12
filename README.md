@@ -1,4 +1,7 @@
-# Coverage Lens
+# MCP Coverage Lens
+
+[![npm version](https://img.shields.io/npm/v/coverage-lens.svg)](https://www.npmjs.com/package/coverage-lens)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 An MCP (Model Context Protocol) server that reads test coverage reports and provides coverage data to AI assistants like Claude.
 
@@ -18,43 +21,34 @@ An MCP (Model Context Protocol) server that reads test coverage reports and prov
 
 ## Installation
 
+### Using Claude Code CLI
+
+The easiest way to add Coverage Lens to Claude Code:
+
 ```bash
-# Clone the repository
-git clone https://github.com/denisonamaral/mcp-coverage-lens.git
-cd mcp-coverage-lens
-
-# Install dependencies
-npm install
-
-# Build the project
-npm run build
+claude mcp add coverage-lens -- npx -y coverage-lens
 ```
 
-## Configuration
+### Manual Configuration
+
+Add the following to your MCP configuration file:
+
+```json
+{
+  "mcpServers": {
+    "coverage-lens": {
+      "command": "npx",
+      "args": ["-y", "coverage-lens"]
+    }
+  }
+}
+```
 
 ### Environment Variables
 
 | Variable                    | Description                                  | Default                 |
 | --------------------------- | -------------------------------------------- | ----------------------- |
 | `COVERAGE_REPORT_FILE_PATH` | Optional custom path to your clover.xml file | `./coverage/clover.xml` |
-
-### Claude Desktop Configuration
-
-Add the following to your configuration file:
-
-```json
-{
-  "mcpServers": {
-    "coverage-lens": {
-      "command": "node",
-      "args": ["/absolute/path/to/mcp-coverage-lens/build/index.js"],
-      "env": {
-        "COVERAGE_REPORT_FILE_PATH": "/path/to/your/project/coverage/clover.xml" //Optional
-      }
-    }
-  }
-}
-```
 
 ## Available Tools
 
@@ -64,7 +58,7 @@ Returns coverage data for a specific file from the test report.
 
 **Parameters:**
 
-- `targetFile` (string, required): File name to get coverage for
+- `targetFile` (string, required): File name or partial path to search for
 
 **Example usage in Claude:**
 
@@ -91,9 +85,15 @@ Coverage Lens reads Clover XML format. Here's how to generate compatible reports
 }
 ```
 
+Jest generates clover.xml by default in the `coverage/` directory.
+
 ## Development
 
 ```bash
+# Clone the repository
+git clone https://github.com/denisonamaral/mcp-coverage-lens.git
+cd mcp-coverage-lens
+
 # Install dependencies
 npm install
 
