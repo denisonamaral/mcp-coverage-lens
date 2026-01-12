@@ -1,11 +1,20 @@
 {
   "name": "coverage-lens",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "A Model Context Protocol (MCP) server that extracts and analyzes code coverage data from your test reports.",
+  "author": "Denison Amaral",
+  "main": "./build/index.js",
   "type": "module",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/denisonamaral/mcp-coverage-lens"
+  },
+  "engines": {
+    "node": ">=18"
+  },
   "bin": {
-    "weather": "./build/index.js"
+    "coverage-lens": "./build/index.js"
   },
   "scripts": {
     "build": "tsc && chmod 755 build/index.js",
@@ -14,7 +23,16 @@
   "files": [
     "build"
   ],
-  "keywords": [],
+  "keywords": [
+    "mcp",
+    "coverage",
+    "jest",
+    "testing",
+    "clover",
+    "lcov",
+    "claude",
+    "anthropic"
+  ],
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.25.2",
     "zod": "^3.25.76"
