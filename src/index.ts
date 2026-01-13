@@ -15,6 +15,14 @@ function sanitizeInput(input: string): string {
   return input.replace(/^["']|["']$/g, "").trim();
 }
 
+function hasFileExtension(fileName: string): boolean {
+  return /\.[a-zA-Z0-9]+$/.test(fileName);
+}
+
+function escapeRegex(str: string): string {
+  return str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
 function findCoverageReportFile(): string | null {
   const envPath = process.env.COVERAGE_REPORT_FILE_PATH;
   if (envPath && existsSync(envPath)) {
@@ -31,14 +39,28 @@ function findCoverageReportFile(): string | null {
 
 async function extractFileTag(
   reportFilePath: string,
-  fileName: string
+  target: string,
+  searchBy: "name" | "path" = "name"
 ): Promise<string | null> {
   const stream = createReadStream(reportFilePath, { encoding: "utf-8" });
   const rl = createInterface({ input: stream, crlfDelay: Infinity });
 
   let capturing = false;
   let content = "";
-  const startPattern = new RegExp(`<file[^>]*name="${fileName}"[^>]*>`);
+
+  let startPattern: RegExp;
+
+  if (searchBy === "path") {
+    startPattern = new RegExp(
+      `<file[^>]*path="[^"]*${escapeRegex(target)}[^"]*"[^>]*>`
+    );
+  } else {
+    startPattern = hasFileExtension(target)
+      ? new RegExp(`<file[^>]*name="[^"]*${escapeRegex(target)}"[^>]*>`)
+      : new RegExp(
+          `<file[^>]*name="[^"]*${escapeRegex(target)}(\\.[^"]+)?"[^>]*>`
+        );
+  }
 
   try {
     for await (const line of rl) {
@@ -103,7 +125,11 @@ server.registerTool(
       };
     }
 
-    const coverage = await extractFileTag(resolvedPath, cleanTargetFile);
+    let coverage = await extractFileTag(resolvedPath, cleanTargetFile, "name");
+
+    if (!coverage) {
+      coverage = await extractFileTag(resolvedPath, cleanTargetFile, "path");
+    }
 
     if (!coverage) {
       return {
